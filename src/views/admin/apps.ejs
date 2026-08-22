@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en" class="h-full <%= locals.currentUser.theme_preference === 'dark' ? 'dark' : '' %>">
+  <head>
+    <%- include('../partials/head', { title: 'Manage Apps' }) %>
+  </head>
+  <body class="min-h-full bg-gray-50 font-sans text-gray-900 dark:bg-gray-950 dark:text-gray-100">
+    <%- include('../partials/nav', { activeNav: 'admin' }) %>
+
+    <main class="mx-auto max-w-6xl px-4 py-8">
+      <%- include('../partials/adminNav', { section: 'apps' }) %>
+
+      <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <h2 class="text-lg font-semibold">Manage Apps</h2>
+        <div class="flex gap-2">
+          <a href="/admin/apps/export.csv" class="btn-secondary">Download as CSV</a>
+          <a href="/admin/apps/new" class="btn-primary">+ Add App</a>
+        </div>
+      </div>
+
+      <% const categories = locals.categories; %>
+      <% categories.forEach(function (category) { %>
+      <% const categoryApps = apps.filter(function (a) { return a.category_id === category.id; }); %>
+      <section class="mb-8">
+        <h3 class="mb-2 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide">
+          <span class="h-2.5 w-2.5 rounded-full" style="background-color: <%= category.accent_colour %>"></span>
+          <%= category.name %>
+        </h3>
+
+        <% if (categoryApps.length === 0) { %>
+        <p class="text-sm text-gray-500 dark:text-gray-400">No apps in this category yet.</p>
+        <% } else { %>
+        <div class="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700">
+          <div class="divide-y divide-gray-200 dark:divide-gray-700" data-admin-app-group="<%= category.id %>">
+            <% categoryApps.forEach(function (app) { %>
+            <div
+              data-admin-app-row
+              data-app-id="<%= app.id %>"
+              class="flex cursor-move items-center gap-3 bg-white px-4 py-3 dark:bg-gray-800"
+            >
+              <span class="text-xl"><%= app.icon %></span>
+              <div class="min-w-0 flex-1">
+                <p class="truncate font-medium">
+                  <%= app.name %>
+                  <% if (!app.is_active) { %><span class="badge bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300">Hidden</span><% } %>
+                  <% if (app.status === 'internal') { %><span class="badge bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300">Internal</span><% } %>
+                  <% if (app.status === 'beta') { %><span class="badge bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">Beta</span><% } %>
+                  <% if (app.visibility === 'restricted') { %><span title="Restricted">🔒</span><% } %>
+                </p>
+                <p class="truncate text-sm text-gray-500 dark:text-gray-400"><%= app.description %></p>
+              </div>
+              <a href="/admin/apps/<%= app.id %>/edit" class="btn-secondary">Edit</a>
+              <form method="POST" action="/admin/apps/<%= app.id %>/delete" onsubmit="return confirm('Delete this app? This cannot be undone.');">
+                <button type="submit" class="btn-danger">Delete</button>
+              </form>
+            </div>
+            <% }) %>
+          </div>
+        </div>
+        <% } %>
+      </section>
+      <% }) %>
+    </main>
+
+    <%- include('../partials/toast', { toast: toast }) %>
+    <script src="/js/adminApps.js"></script>
+  </body>
+</html>

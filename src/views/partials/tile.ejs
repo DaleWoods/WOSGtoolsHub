@@ -1,0 +1,44 @@
+<%
+  const statusColours = {
+    live: 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300',
+    beta: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300',
+    internal: 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300',
+  };
+%>
+<div
+  class="tile"
+  data-tile
+  data-app-id="<%= tile.id %>"
+  data-name="<%= tile.name %>"
+  data-description="<%= tile.description %>"
+>
+  <div class="flex items-start justify-between gap-2">
+    <span class="text-2xl leading-none"><%= tile.icon %></span>
+    <div class="flex items-center gap-1.5">
+      <% if (tile.is_new) { %>
+      <span class="badge bg-brand-accent/10 text-brand-accent">New</span>
+      <% } %> <% if (tile.is_locked) { %>
+      <span title="Restricted app — visible to selected users only">🔒</span>
+      <% } %>
+      <span class="badge <%= statusColours[tile.status] %>"><%= tile.status %></span>
+    </div>
+  </div>
+
+  <div>
+    <h3 class="font-semibold text-gray-900 dark:text-gray-50"><%= tile.name %></h3>
+    <p class="text-sm text-gray-600 dark:text-gray-400"><%= tile.description %></p>
+    <% if (tile.notes) { %>
+    <p class="mt-1 text-xs italic text-gray-500 dark:text-gray-500">✨ <%= tile.notes %></p>
+    <% } %>
+  </div>
+
+  <a
+    href="<%= tile.url %>"
+    target="_blank"
+    rel="noopener noreferrer"
+    data-open-app-id="<%= tile.id %>"
+    class="btn-primary mt-auto"
+  >
+    Open
+  </a>
+</div>

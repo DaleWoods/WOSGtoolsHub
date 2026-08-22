@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en" class="h-full <%= theme === 'dark' ? 'dark' : '' %>">
+  <head>
+    <%- include('partials/head', { title: 'Dashboard' }) %>
+  </head>
+  <body class="min-h-full bg-gray-50 font-sans text-gray-900 dark:bg-gray-950 dark:text-gray-100">
+    <%- include('partials/nav', { activeNav: 'dashboard' }) %>
+
+    <main class="mx-auto max-w-6xl px-4 py-8">
+      <div class="mb-8 flex flex-col items-center gap-3 text-center sm:flex-row sm:justify-between sm:text-left">
+        <div class="flex items-center gap-3">
+          <div
+            class="flex h-11 w-11 items-center justify-center rounded-full bg-brand-accent text-sm font-semibold text-white"
+          >
+            <%= initials %>
+          </div>
+          <div>
+            <p class="text-lg font-semibold"><%= greeting %>, <%= locals.currentUser.username %></p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Here's what's available to you today.</p>
+          </div>
+        </div>
+
+        <div class="w-full max-w-xs">
+          <input
+            id="tile-search"
+            type="search"
+            placeholder="Search apps…"
+            class="form-input"
+            autocomplete="off"
+          />
+        </div>
+      </div>
+
+      <% if (recent.length > 0) { %>
+      <section class="mb-10">
+        <h2 class="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+          Recently opened
+        </h2>
+        <div class="flex flex-wrap gap-3">
+          <% recent.forEach(function (app) { %>
+          <a
+            href="<%= app.url %>"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-open-app-id="<%= app.id %>"
+            class="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm transition hover:-translate-y-0.5 hover:shadow-tile-hover dark:border-gray-700 dark:bg-gray-800"
+          >
+            <span class="text-lg"><%= app.icon %></span>
+            <span><%= app.name %></span>
+          </a>
+          <% }) %>
+        </div>
+      </section>
+      <% } %> <% if (groups.length === 0) { %>
+      <p class="text-center text-gray-500 dark:text-gray-400">
+        No tools are available to you yet. Check back soon.
+      </p>
+      <% } %> <% groups.forEach(function (group) { %>
+      <section class="mb-10" data-category-group>
+        <h2 class="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide">
+          <span class="h-2.5 w-2.5 rounded-full" style="background-color: <%= group.category.accent_colour %>"></span>
+          <span style="color: <%= group.category.accent_colour %>"><%= group.category.name %></span>
+        </h2>
+        <div
+          class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+          data-tile-grid
+        >
+          <% group.tiles.forEach(function (tile) { %> <%- include('partials/tile', { tile: tile }) %> <% }) %>
+        </div>
+      </section>
+      <% }) %>
+    </main>
+
+    <script src="/js/dashboard.js"></script>
+  </body>
+</html>

@@ -1,0 +1,9 @@
+<% if (typeof toast !== 'undefined' && toast) { %>
+<div
+  id="toast"
+  class="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white shadow-lg transition-opacity duration-300 dark:bg-gray-100 dark:text-gray-900"
+>
+  <%= toast %>
+</div>
+<script src="/js/toast.js"></script>
+<% } %>

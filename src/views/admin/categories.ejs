@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en" class="h-full <%= locals.currentUser.theme_preference === 'dark' ? 'dark' : '' %>">
+  <head>
+    <%- include('../partials/head', { title: 'Manage Categories' }) %>
+  </head>
+  <body class="min-h-full bg-gray-50 font-sans text-gray-900 dark:bg-gray-950 dark:text-gray-100">
+    <%- include('../partials/nav', { activeNav: 'admin' }) %>
+
+    <main class="mx-auto max-w-3xl px-4 py-8">
+      <%- include('../partials/adminNav', { section: 'categories' }) %>
+
+      <h2 class="mb-4 text-lg font-semibold">Manage Categories</h2>
+
+      <div id="category-list" class="mb-8 divide-y divide-gray-200 overflow-hidden rounded-xl border border-gray-200 dark:divide-gray-700 dark:border-gray-700">
+        <% categories.forEach(function (category) { %>
+        <div data-category-row data-category-id="<%= category.id %>" class="flex cursor-move items-center gap-3 bg-white px-4 py-3 dark:bg-gray-800">
+          <span class="h-4 w-4 rounded-full" style="background-color: <%= category.accent_colour %>"></span>
+          <form method="POST" action="/admin/categories/<%= category.id %>" class="flex flex-1 flex-wrap items-center gap-2">
+            <input type="text" name="name" value="<%= category.name %>" required class="form-input flex-1" />
+            <input type="color" name="accentColour" value="<%= category.accent_colour %>" class="h-9 w-12 rounded border border-gray-300 dark:border-gray-600" />
+            <button type="submit" class="btn-secondary">Save</button>
+          </form>
+          <form method="POST" action="/admin/categories/<%= category.id %>/delete" onsubmit="return confirm('Delete this category? Apps must be reassigned first.');">
+            <button type="submit" class="btn-danger">Delete</button>
+          </form>
+        </div>
+        <% }) %>
+      </div>
+
+      <h3 class="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Add category</h3>
+      <form method="POST" action="/admin/categories" class="flex flex-wrap items-center gap-2 rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
+        <input type="text" name="name" placeholder="Category name" required class="form-input flex-1" />
+        <input type="color" name="accentColour" value="#4f46e5" class="h-9 w-12 rounded border border-gray-300 dark:border-gray-600" />
+        <button type="submit" class="btn-primary">Add</button>
+      </form>
+    </main>
+
+    <%- include('../partials/toast', { toast: toast }) %>
+    <script src="/js/adminCategories.js"></script>
+  </body>
+</html>

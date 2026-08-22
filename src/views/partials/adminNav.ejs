@@ -1,0 +1,21 @@
+<nav class="mb-6 flex flex-wrap justify-center gap-2 border-b border-gray-200 pb-4 dark:border-gray-700">
+  <a href="/admin/apps" class="admin-nav-link <%= section === 'apps' ? 'active' : '' %>">Manage Apps</a>
+  <a href="/admin/categories" class="admin-nav-link <%= section === 'categories' ? 'active' : '' %>">Manage Categories</a>
+  <a href="/admin/users" class="admin-nav-link <%= section === 'users' ? 'active' : '' %>">Manage Users</a>
+  <a href="/admin/security-log" class="admin-nav-link <%= section === 'security-log' ? 'active' : '' %>">Security Log</a>
+</nav>
+
+<div class="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+  <div class="rounded-xl border border-gray-200 bg-white p-4 text-center dark:border-gray-700 dark:bg-gray-800">
+    <p class="text-2xl font-semibold"><%= stats.totalApps %></p>
+    <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Total apps</p>
+  </div>
+  <div class="rounded-xl border border-gray-200 bg-white p-4 text-center dark:border-gray-700 dark:bg-gray-800">
+    <p class="text-2xl font-semibold"><%= stats.totalUsers %></p>
+    <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Total users</p>
+  </div>
+  <div class="rounded-xl border border-gray-200 bg-white p-4 text-center dark:border-gray-700 dark:bg-gray-800">
+    <p class="text-2xl font-semibold"><%= stats.appsAddedThisMonth %></p>
+    <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Apps added this month</p>
+  </div>
+</div>

@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en" class="h-full <%= locals.currentUser.theme_preference === 'dark' ? 'dark' : '' %>">
+  <head>
+    <%- include('../partials/head', { title: 'Manage Users' }) %>
+  </head>
+  <body class="min-h-full bg-gray-50 font-sans text-gray-900 dark:bg-gray-950 dark:text-gray-100">
+    <%- include('../partials/nav', { activeNav: 'admin' }) %>
+
+    <main class="mx-auto max-w-4xl px-4 py-8">
+      <%- include('../partials/adminNav', { section: 'users' }) %>
+
+      <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <h2 class="text-lg font-semibold">Manage Users</h2>
+        <a href="/admin/users/export.csv" class="btn-secondary">Download as CSV</a>
+      </div>
+
+      <% if (typeof error !== 'undefined' && error) { %>
+      <p class="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-900/30 dark:text-red-400"><%= error %></p>
+      <% } %>
+
+      <div class="mb-8 divide-y divide-gray-200 overflow-hidden rounded-xl border border-gray-200 dark:divide-gray-700 dark:border-gray-700">
+        <% users.forEach(function (u) { %>
+        <div class="flex flex-col gap-3 bg-white px-4 py-3 dark:bg-gray-800 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p class="font-medium">
+              <%= u.username %>
+              <% if (!u.is_active) { %><span class="badge bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300">Deactivated</span><% } %>
+              <% if (u.id === locals.currentUser.id) { %><span class="badge bg-brand-accent/10 text-brand-accent">You</span><% } %>
+            </p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">
+              Last login:
+              <%= u.last_login_at ? new Date(u.last_login_at).toLocaleString('en-GB', { timeZone: 'Europe/London', dateStyle: 'medium', timeStyle: 'short' }) : 'Never' %>
+            </p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <form method="POST" action="/admin/users/<%= u.id %>/role" class="flex items-center gap-1">
+              <select name="role" class="form-input py-1 text-sm" <%= u.id === locals.currentUser.id ? 'disabled' : '' %>>
+                <option value="user" <%= u.role === 'user' ? 'selected' : '' %>>User</option>
+                <option value="admin" <%= u.role === 'admin' ? 'selected' : '' %>>Admin</option>
+              </select>
+              <button type="submit" class="btn-secondary" <%= u.id === locals.currentUser.id ? 'disabled' : '' %>>Save</button>
+            </form>
+
+            <details class="relative">
+              <summary class="btn-secondary cursor-pointer list-none">Reset password</summary>
+              <form method="POST" action="/admin/users/<%= u.id %>/reset-password" class="absolute right-0 z-10 mt-2 w-64 space-y-2 rounded-lg border border-gray-200 bg-white p-3 shadow-lg dark:border-gray-700 dark:bg-gray-800">
+                <label class="form-label">New temporary password</label>
+                <input type="text" name="password" required class="form-input" placeholder="Min 10 chars, Aa1" />
+                <button type="submit" class="btn-primary w-full">Set password</button>
+              </form>
+            </details>
+
+            <form method="POST" action="/admin/users/<%= u.id %>/active">
+              <input type="hidden" name="isActive" value="<%= u.is_active ? 'false' : 'true' %>" />
+              <button type="submit" class="btn-secondary" <%= u.id === locals.currentUser.id ? 'disabled' : '' %>>
+                <%= u.is_active ? 'Deactivate' : 'Activate' %>
+              </button>
+            </form>
+
+            <form method="POST" action="/admin/users/<%= u.id %>/delete" onsubmit="return confirm('Delete this user? This cannot be undone.');">
+              <button type="submit" class="btn-danger" <%= u.id === locals.currentUser.id ? 'disabled' : '' %>>Delete</button>
+            </form>
+          </div>
+        </div>
+        <% }) %>
+      </div>
+
+      <h3 class="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Add user</h3>
+      <form method="POST" action="/admin/users" class="grid grid-cols-1 gap-3 rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 sm:grid-cols-4">
+        <input type="text" name="username" placeholder="Username" required class="form-input" />
+        <input type="text" name="password" placeholder="Temporary password" required class="form-input" />
+        <select name="role" class="form-input">
+          <option value="user">User</option>
+          <option value="admin">Admin</option>
+        </select>
+        <button type="submit" class="btn-primary">Add user</button>
+      </form>
+      <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+        Passwords need 10+ characters with at least one uppercase letter, one lowercase letter, and one number.
+        Share the temporary password with the user out of band (Slack/email) — there's no forced change on first login.
+      </p>
+    </main>
+
+    <%- include('../partials/toast', { toast: toast }) %>
+  </body>
+</html>
