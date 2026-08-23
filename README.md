@@ -7,10 +7,8 @@ grouped by category, and click through to whichever tool they need — each
 tool stays on its own existing Render URL. This is a directory + gateway, not
 a reverse proxy.
 
-This is a standalone Node/Express app living inside the `wosgRegression`
-repo. It has its own `package.json` and is unrelated to the Playwright
-regression suite at the repo root — `npm run verify` at the repo root does
-not touch this directory, and vice versa.
+Standalone Node/Express app, deployed independently of WOSG's other repos
+(e.g. the Playwright regression suite) via its own Render Blueprint.
 
 ## Stack
 
