@@ -45,6 +45,14 @@ the blueprint; `SESSION_SECRET`, `ADMIN_USERNAME`, `ADMIN_PASSWORD` and
 office/VPN egress). Requests from outside this list get a generic 404, never
 a "not authorized" message. Leave it blank for local development.
 
+WOSG's office/VPN egress IPs (set this as `ALLOWED_IP_RANGES` in the Render
+dashboard — it's `sync: false` in `render.yaml`, so it isn't stored in the
+repo):
+
+```
+85.210.2.82,20.68.255.255,51.141.32.83,51.141.32.106,81.128.186.100,81.128.186.101,81.128.177.69,81.128.177.68
+```
+
 ## Deployment
 
 Deploys as a Render Blueprint (`render.yaml`): one Node web service plus a
@@ -60,9 +68,6 @@ even from outside the IP allowlist.
   the real WOSG logo file, hex codes and font from Dale.
 - **Seeded app URLs** — the four seeded tools have blank URLs; fill these in
   from Manage Apps once each tool's Render URL is known.
-- **IP allowlist** — `ALLOWED_IP_RANGES` needs WOSG's real office/VPN CIDR
-  range(s) before this goes live; until then the app is reachable from
-  anywhere it's deployed.
 
 ## Scripts
 
