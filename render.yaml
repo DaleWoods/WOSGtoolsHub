@@ -9,7 +9,7 @@ services:
     runtime: node
     plan: free
     region: oregon
-    buildCommand: npm ci && npm run build && npm run migrate
+    buildCommand: npm ci --include=dev && npm run build && npm run migrate
     startCommand: npm start
     healthCheckPath: /healthz
     envVars:
