@@ -1,6 +1,6 @@
 databases:
   - name: wosg-tools-hub-db
-    plan: free
+    plan: starter
     postgresMajorVersion: 16
 
 services:
