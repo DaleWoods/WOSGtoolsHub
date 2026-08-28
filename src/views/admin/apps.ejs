@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="h-full <%= locals.currentUser.theme_preference === 'dark' ? 'dark' : '' %>">
+<html lang="en" class="h-full">
   <head>
     <%- include('../partials/head', { title: 'Manage Apps' }) %>
   </head>
@@ -15,6 +15,18 @@
           <a href="/admin/apps/export.csv" class="btn-secondary">Download as CSV</a>
           <a href="/admin/apps/new" class="btn-primary">+ Add App</a>
         </div>
+      </div>
+
+      <div
+        id="bulk-action-bar"
+        class="mb-4 hidden items-center gap-3 rounded-xl border border-brand-accent/30 bg-brand-accent/10 px-4 py-2.5"
+      >
+        <span id="bulk-selected-count" class="text-sm font-medium">0 selected</span>
+        <button type="button" data-bulk-action="activate" class="btn-secondary">Activate</button>
+        <button type="button" data-bulk-action="deactivate" class="btn-secondary">Deactivate</button>
+        <button type="button" id="bulk-clear" class="ml-auto text-sm text-gray-500 hover:underline dark:text-gray-400">
+          Clear selection
+        </button>
       </div>
 
       <% const categories = locals.categories; %>
@@ -37,7 +49,23 @@
               data-app-id="<%= app.id %>"
               class="flex cursor-move items-center gap-3 bg-white px-4 py-3 dark:bg-gray-800"
             >
-              <span class="text-xl"><%= app.icon %></span>
+              <input
+                type="checkbox"
+                data-app-checkbox
+                value="<%= app.id %>"
+                class="h-4 w-4 shrink-0 cursor-pointer"
+                aria-label="Select <%= app.name %>"
+                onclick="event.stopPropagation()"
+              />
+              <span class="relative shrink-0 text-xl">
+                <%= app.icon %>
+                <% if (app.health_status !== 'unknown') { %>
+                <span
+                  class="absolute -bottom-0.5 -right-1 h-2 w-2 rounded-full border-2 border-white dark:border-gray-800 <%= app.health_status === 'up' ? 'bg-green-500' : 'bg-red-500' %>"
+                  title="<%= app.health_status === 'up' ? 'Reachable' : 'Unreachable' %><%= app.health_checked_at ? ' — checked ' + new Date(app.health_checked_at).toLocaleString('en-GB', { timeZone: 'Europe/London', dateStyle: 'short', timeStyle: 'short' }) : '' %>"
+                ></span>
+                <% } %>
+              </span>
               <div class="min-w-0 flex-1">
                 <p class="truncate font-medium">
                   <%= app.name %>

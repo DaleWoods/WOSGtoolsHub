@@ -11,6 +11,7 @@ import {
 } from '../../services/categories.js';
 import { getAdminStats } from '../../services/stats.js';
 import { logSecurityEvent } from '../../services/securityLog.js';
+import { summariseChanges } from '../../utils/diff.js';
 import { asyncHandler } from '../../utils/asyncHandler.js';
 
 export const adminCategoriesRouter = Router();
@@ -41,9 +42,23 @@ adminCategoriesRouter.post(
 );
 
 adminCategoriesRouter.post(
+  '/reorder',
+  asyncHandler(async (req, res) => {
+    const orderedIds = req.body.orderedIds;
+    if (!Array.isArray(orderedIds) || !orderedIds.every((id) => Number.isInteger(Number(id)))) {
+      res.status(400).json({ error: 'orderedIds must be an array' });
+      return;
+    }
+    await reorderCategories(orderedIds.map((id) => Number(id)));
+    res.json({ ok: true });
+  }),
+);
+
+adminCategoriesRouter.post(
   '/:id',
   asyncHandler(async (req, res) => {
     const id = Number(req.params.id);
+    const before = await getCategory(id);
     const name = String(req.body.name ?? '').trim();
     const accentColour = String(req.body.accentColour ?? '#4f46e5').trim();
     if (!name) {
@@ -51,7 +66,14 @@ adminCategoriesRouter.post(
       return;
     }
     await updateCategory(id, name, accentColour);
-    await logSecurityEvent('category_updated', res.locals.currentUser!.id, name, req.ip ?? null);
+    const details = before
+      ? summariseChanges(
+          { name: before.name, accentColour: before.accent_colour },
+          { name, accentColour },
+          ['name', 'accentColour'],
+        )
+      : null;
+    await logSecurityEvent('category_updated', res.locals.currentUser!.id, name, req.ip ?? null, details);
     res.redirect('/admin/categories?toast=Category updated');
   }),
 );
@@ -74,18 +96,5 @@ adminCategoriesRouter.post(
       req.ip ?? null,
     );
     res.redirect('/admin/categories?toast=Category deleted');
-  }),
-);
-
-adminCategoriesRouter.post(
-  '/reorder',
-  asyncHandler(async (req, res) => {
-    const orderedIds = req.body.orderedIds;
-    if (!Array.isArray(orderedIds) || !orderedIds.every((id) => Number.isInteger(Number(id)))) {
-      res.status(400).json({ error: 'orderedIds must be an array' });
-      return;
-    }
-    await reorderCategories(orderedIds.map((id) => Number(id)));
-    res.json({ ok: true });
   }),
 );

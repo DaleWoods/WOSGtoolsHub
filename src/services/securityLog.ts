@@ -6,10 +6,11 @@ export async function logSecurityEvent(
   actorUserId: number | null,
   target: string | null,
   ipAddress: string | null,
+  details: string | null = null,
 ): Promise<void> {
   await pool.query(
-    `INSERT INTO security_log (event_type, actor_user_id, target, ip_address) VALUES ($1, $2, $3, $4)`,
-    [eventType, actorUserId, target, ipAddress],
+    `INSERT INTO security_log (event_type, actor_user_id, target, ip_address, details) VALUES ($1, $2, $3, $4, $5)`,
+    [eventType, actorUserId, target, ipAddress, details],
   );
 }
 
@@ -40,7 +41,7 @@ export async function listSecurityLog(filter: SecurityLogFilter): Promise<Securi
 
   const result = await pool.query<SecurityLogEntry>(
     `SELECT sl.id, sl.event_type, sl.actor_user_id, u.username AS actor_username,
-            sl.target, sl.ip_address, sl.created_at
+            sl.target, sl.details, sl.ip_address, sl.created_at
      FROM security_log sl
      LEFT JOIN users u ON u.id = sl.actor_user_id
      ${where}

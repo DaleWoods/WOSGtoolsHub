@@ -1,7 +1,8 @@
 export type Role = 'admin' | 'user';
-export type Theme = 'light' | 'dark';
+export type Theme = 'light' | 'dark' | 'system';
 export type AppStatus = 'live' | 'beta' | 'internal';
 export type Visibility = 'all' | 'restricted';
+export type HealthStatus = 'up' | 'down' | 'unknown';
 
 export interface User {
   id: number;
@@ -43,6 +44,8 @@ export interface App {
   sort_order: number;
   is_active: boolean;
   visibility: Visibility;
+  health_status: HealthStatus;
+  health_checked_at: Date | null;
   created_at: Date;
   updated_at: Date;
 }
@@ -81,6 +84,7 @@ export interface SecurityLogEntry {
   actor_user_id: number | null;
   actor_username: string | null;
   target: string | null;
+  details: string | null;
   ip_address: string | null;
   created_at: Date;
 }

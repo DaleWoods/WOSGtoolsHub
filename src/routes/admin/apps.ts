@@ -10,14 +10,18 @@ import {
   listAllAppsForAdmin,
   reorderAppsInCategory,
   setAppAccess,
+  setAppsActiveBulk,
   updateApp,
   type AppInput,
 } from '../../services/apps.js';
 import { getAdminStats } from '../../services/stats.js';
 import { logSecurityEvent } from '../../services/securityLog.js';
 import { toCsv } from '../../utils/csv.js';
+import { summariseChanges } from '../../utils/diff.js';
 import { asyncHandler } from '../../utils/asyncHandler.js';
 import type { AppStatus, Visibility } from '../../types/index.js';
+
+const DIFF_FIELDS = ['name', 'description', 'url', 'icon', 'status', 'visibility', 'notes', 'isActive'];
 
 export const adminAppsRouter = Router();
 
@@ -117,32 +121,27 @@ adminAppsRouter.get(
 );
 
 adminAppsRouter.post(
-  '/:id',
+  '/bulk',
   asyncHandler(async (req, res) => {
-    const id = Number(req.params.id);
-    const input = parseAppInput(req.body);
-    await updateApp(id, input);
+    const appIds = Array.isArray(req.body.appIds)
+      ? req.body.appIds.map((id: unknown) => Number(id)).filter((id: number) => Number.isInteger(id))
+      : [];
+    const action = req.body.action;
 
-    if (input.visibility === 'restricted') {
-      const userIds = normaliseUserIds(req.body.userIds);
-      await setAppAccess(id, userIds);
-    } else {
-      await setAppAccess(id, []);
+    if (appIds.length === 0 || (action !== 'activate' && action !== 'deactivate')) {
+      res.status(400).json({ error: 'appIds (non-empty) and action ("activate" | "deactivate") are required' });
+      return;
     }
 
-    await logSecurityEvent('app_updated', res.locals.currentUser!.id, input.name, req.ip ?? null);
-    res.redirect('/admin/apps?toast=App updated');
-  }),
-);
-
-adminAppsRouter.post(
-  '/:id/delete',
-  asyncHandler(async (req, res) => {
-    const id = Number(req.params.id);
-    const app = await getAppById(id);
-    await deleteApp(id);
-    await logSecurityEvent('app_deleted', res.locals.currentUser!.id, app?.name ?? String(id), req.ip ?? null);
-    res.redirect('/admin/apps?toast=App deleted');
+    await setAppsActiveBulk(appIds, action === 'activate');
+    await logSecurityEvent(
+      'app_updated',
+      res.locals.currentUser!.id,
+      `${appIds.length} app(s)`,
+      req.ip ?? null,
+      `Bulk ${action}d: app ids ${appIds.join(', ')}`,
+    );
+    res.json({ ok: true });
   }),
 );
 
@@ -160,6 +159,63 @@ adminAppsRouter.post(
       orderedIds.map((id) => Number(id)),
     );
     res.json({ ok: true });
+  }),
+);
+
+adminAppsRouter.post(
+  '/:id',
+  asyncHandler(async (req, res) => {
+    const id = Number(req.params.id);
+    const before = await getAppById(id);
+    const input = parseAppInput(req.body);
+    await updateApp(id, input);
+
+    if (input.visibility === 'restricted') {
+      const userIds = normaliseUserIds(req.body.userIds);
+      await setAppAccess(id, userIds);
+    } else {
+      await setAppAccess(id, []);
+    }
+
+    const details = before
+      ? summariseChanges(
+          {
+            name: before.name,
+            description: before.description,
+            url: before.url,
+            icon: before.icon,
+            status: before.status,
+            visibility: before.visibility,
+            notes: before.notes,
+            isActive: before.is_active,
+          },
+          {
+            name: input.name,
+            description: input.description,
+            url: input.url,
+            icon: input.icon,
+            status: input.status,
+            visibility: input.visibility,
+            notes: input.notes,
+            isActive: input.isActive,
+          },
+          DIFF_FIELDS,
+        )
+      : null;
+
+    await logSecurityEvent('app_updated', res.locals.currentUser!.id, input.name, req.ip ?? null, details);
+    res.redirect('/admin/apps?toast=App updated');
+  }),
+);
+
+adminAppsRouter.post(
+  '/:id/delete',
+  asyncHandler(async (req, res) => {
+    const id = Number(req.params.id);
+    const app = await getAppById(id);
+    await deleteApp(id);
+    await logSecurityEvent('app_deleted', res.locals.currentUser!.id, app?.name ?? String(id), req.ip ?? null);
+    res.redirect('/admin/apps?toast=App deleted');
   }),
 );
 

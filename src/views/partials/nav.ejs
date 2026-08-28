@@ -13,14 +13,8 @@
       <% if (user.role === 'admin') { %>
       <a href="/admin/apps" class="admin-nav-link <%= currentPath.startsWith('admin') ? 'active' : '' %>">Admin</a>
       <% } %>
-      <button
-        id="theme-toggle"
-        type="button"
-        aria-pressed="<%= user.theme_preference === 'dark' %>"
-        class="admin-nav-link"
-        title="Toggle light/dark mode"
-      >
-        <%= user.theme_preference === 'dark' ? '☀️ Light' : '🌙 Dark' %>
+      <button id="theme-toggle" type="button" class="admin-nav-link" title="Toggle light/dark mode">
+        <span id="theme-toggle-label">Theme</span>
       </button>
       <form method="POST" action="/logout" class="inline">
         <button type="submit" class="admin-nav-link">Sign out</button>

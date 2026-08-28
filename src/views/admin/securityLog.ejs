@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="h-full <%= locals.currentUser.theme_preference === 'dark' ? 'dark' : '' %>">
+<html lang="en" class="h-full">
   <head>
     <%- include('../partials/head', { title: 'Security Log' }) %>
   </head>
@@ -41,6 +41,7 @@
               <th class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-400">Event</th>
               <th class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-400">Actor</th>
               <th class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-400">Target</th>
+              <th class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-400">What changed</th>
               <th class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-400">IP address</th>
             </tr>
           </thead>
@@ -53,11 +54,12 @@
               <td class="whitespace-nowrap px-4 py-2"><%= entry.event_type %></td>
               <td class="whitespace-nowrap px-4 py-2"><%= entry.actor_username ?? '—' %></td>
               <td class="px-4 py-2"><%= entry.target ?? '—' %></td>
+              <td class="max-w-xs px-4 py-2 text-xs text-gray-600 dark:text-gray-400"><%= entry.details ?? '—' %></td>
               <td class="whitespace-nowrap px-4 py-2"><%= entry.ip_address ?? '—' %></td>
             </tr>
             <% }) %> <% if (entries.length === 0) { %>
             <tr>
-              <td colspan="5" class="px-4 py-6 text-center text-gray-500 dark:text-gray-400">No matching events.</td>
+              <td colspan="6" class="px-4 py-6 text-center text-gray-500 dark:text-gray-400">No matching events.</td>
             </tr>
             <% } %>
           </tbody>

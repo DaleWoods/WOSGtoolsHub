@@ -41,7 +41,6 @@ dashboardRouter.get(
       recent,
       greeting: getGreeting(),
       initials: getInitials(user.username),
-      theme: user.theme_preference,
     });
   }),
 );
