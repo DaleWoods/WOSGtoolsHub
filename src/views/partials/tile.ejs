@@ -4,6 +4,13 @@
     beta: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300',
     internal: 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300',
   };
+  const healthDotColours = { up: 'bg-green-500', down: 'bg-red-500', unknown: 'bg-gray-300 dark:bg-gray-600' };
+  const healthLabel =
+    tile.health_status === 'up'
+      ? 'Reachable'
+      : tile.health_status === 'down'
+        ? 'Unreachable'
+        : 'Health unknown';
 %>
 <div
   class="tile"
@@ -13,7 +20,15 @@
   data-description="<%= tile.description %>"
 >
   <div class="flex items-start justify-between gap-2">
-    <span class="text-2xl leading-none"><%= tile.icon %></span>
+    <span class="relative text-2xl leading-none">
+      <%= tile.icon %>
+      <% if (tile.health_status !== 'unknown') { %>
+      <span
+        class="absolute -bottom-0.5 -right-1 h-2.5 w-2.5 rounded-full border-2 border-white dark:border-gray-800 <%= healthDotColours[tile.health_status] %>"
+        title="<%= healthLabel %><%= tile.health_checked_at ? ' — checked ' + new Date(tile.health_checked_at).toLocaleString('en-GB', { timeZone: 'Europe/London', dateStyle: 'short', timeStyle: 'short' }) : '' %>"
+      ></span>
+      <% } %>
+    </span>
     <div class="flex items-center gap-1.5">
       <% if (tile.is_new) { %>
       <span class="badge bg-brand-accent/10 text-brand-accent">New</span>

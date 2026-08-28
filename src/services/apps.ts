@@ -94,6 +94,14 @@ export async function deleteApp(id: number): Promise<void> {
   await pool.query(`DELETE FROM apps WHERE id = $1`, [id]);
 }
 
+export async function setAppsActiveBulk(ids: number[], isActive: boolean): Promise<void> {
+  if (ids.length === 0) return;
+  await pool.query(`UPDATE apps SET is_active = $1, updated_at = now() WHERE id = ANY($2::int[])`, [
+    isActive,
+    ids,
+  ]);
+}
+
 export async function reorderAppsInCategory(categoryId: number, orderedIds: number[]): Promise<void> {
   const client = await pool.connect();
   try {

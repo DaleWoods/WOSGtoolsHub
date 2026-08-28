@@ -12,6 +12,9 @@ import { dashboardRouter } from './routes/dashboard.js';
 import { healthRouter } from './routes/health.js';
 import { adminRouter } from './routes/admin/index.js';
 import { bootstrapFirstAdmin, seedCategoriesAndApps } from './services/bootstrap.js';
+import { runHealthChecks } from './services/healthCheck.js';
+
+const HEALTH_CHECK_INTERVAL_MS = 5 * 60 * 1000;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -69,6 +72,11 @@ async function start(): Promise<void> {
   app.listen(env.port, () => {
     console.log(`WOSG Tools Hub listening on port ${env.port}`);
   });
+
+  runHealthChecks().catch((error: unknown) => console.error('Health check run failed:', error));
+  setInterval(() => {
+    runHealthChecks().catch((error: unknown) => console.error('Health check run failed:', error));
+  }, HEALTH_CHECK_INTERVAL_MS);
 }
 
 start().catch((error: unknown) => {

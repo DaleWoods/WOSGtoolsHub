@@ -78,10 +78,17 @@ adminUsersRouter.post(
   '/:id/role',
   asyncHandler(async (req, res) => {
     const id = Number(req.params.id);
+    const before = await findUserById(id);
     const role: Role = req.body.role === 'admin' ? 'admin' : 'user';
     await updateUserRole(id, role);
-    const user = await findUserById(id);
-    await logSecurityEvent('user_updated', res.locals.currentUser!.id, user?.username ?? String(id), req.ip ?? null);
+    const details = before && before.role !== role ? `role: ${before.role} → ${role}` : null;
+    await logSecurityEvent(
+      'user_updated',
+      res.locals.currentUser!.id,
+      before?.username ?? String(id),
+      req.ip ?? null,
+      details,
+    );
     res.redirect('/admin/users?toast=Role updated');
   }),
 );
@@ -102,6 +109,7 @@ adminUsersRouter.post(
       res.locals.currentUser!.id,
       user?.username ?? String(id),
       req.ip ?? null,
+      `is_active: ${!isActive} → ${isActive}`,
     );
     res.redirect(`/admin/users?toast=User ${isActive ? 'activated' : 'deactivated'}`);
   }),

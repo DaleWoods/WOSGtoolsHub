@@ -1,5 +1,22 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title><%= typeof title !== 'undefined' ? title + ' — WOSG Tools Hub' : 'WOSG Tools Hub' %></title>
+
+<script>
+  // Runs synchronously before first paint so there's no flash of the wrong
+  // theme. When the user hasn't made an explicit choice ('system', or no
+  // session yet), we fall back to their OS/browser preference — the server
+  // can't see that, so this can only be decided client-side.
+  (function () {
+    var pref = '<%= locals.currentUser ? locals.currentUser.theme_preference : "system" %>';
+    var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var isDark = pref === 'dark' || (pref === 'system' && prefersDark);
+    if (isDark) document.documentElement.classList.add('dark');
+  })();
+</script>
+
+<link rel="manifest" href="/manifest.json" />
+<meta name="theme-color" content="#1f2937" />
+<link rel="icon" href="/images/favicon-32.png" type="image/png" sizes="32x32" />
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png" />
 <link rel="stylesheet" href="/css/output.css" />
-<link rel="icon" href="/images/logo-placeholder.svg" type="image/svg+xml" />
