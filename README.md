@@ -10,6 +10,10 @@ a reverse proxy.
 Standalone Node/Express app, deployed independently of WOSG's other repos
 (e.g. the Playwright regression suite) via its own Render Blueprint.
 
+See **[SPEC.md](./SPEC.md)** for the full requirements, architecture
+decisions, data model, and a checklist of what's done vs still pending —
+this README only covers day-to-day setup and scripts.
+
 ## Stack
 
 - Node.js + TypeScript + Express
@@ -66,6 +70,8 @@ even from outside the IP allowlist.
   the real WOSG logo file, hex codes and font from Dale.
 - **Seeded app URLs** — the four seeded tools have blank URLs; fill these in
   from Manage Apps once each tool's Render URL is known.
+
+See [SPEC.md](./SPEC.md) §9 for the full done/pending checklist.
 
 ## Scripts
 
